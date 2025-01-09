@@ -33,9 +33,8 @@ async def user_by_id(db: Annotated[Session, Depends(get_db)], user_id:int):
     raise HTTPException(status_code=404, detail="User was not found")
 @router1.post("/create")
 async def create_user(create: CreateUser, db: Annotated[Session, Depends(get_db)]):
-    usernames = db.scalars(select(User.username)).all()
-    for i in usernames:
-        if i == create.username:
+    user = db.scalar(select(User).where(User.username == create.username))
+    if user is not None:
             raise HTTPException(status_code=404, detail="User already exists")
     db.execute(insert(User).values(username=create.username,
                                    firstname=create.firstname,
