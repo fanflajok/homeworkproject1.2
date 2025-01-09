@@ -27,10 +27,9 @@ async def all_users(db: Annotated[Session, Depends(get_db)]):
 
 @router1.get("/user_id")
 async def user_by_id(db: Annotated[Session, Depends(get_db)], user_id:int):
-    uids = db.scalars(select(User)).all()
-    for i in uids:
-        if i.id == user_id:
-            return i.username
+    user = db.scalar(select(User).where(User.id == user_id))
+    if user is not None:
+        return user
     raise HTTPException(status_code=404, detail="User was not found")
 @router1.post("/create")
 async def create_user(create: CreateUser, db: Annotated[Session, Depends(get_db)]):
